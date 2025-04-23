@@ -1,0 +1,5 @@
+.venv
+custom_eval_results/
+data/
+results/
+models/
