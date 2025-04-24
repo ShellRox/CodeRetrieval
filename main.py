@@ -122,7 +122,7 @@ queries = {
 def main():
     # Configuration
     data_dir = "./data/python"
-    subset = "test"
+    subset = "valid"
     output_dir = "./custom_eval_results"
     k = 10
 
