@@ -32,7 +32,8 @@ project/
 ├── models/                  # Directory for saved models
 │   └── codebert-finetuned/  # Fine-tuned CodeBERT model
 ├── preprocessing.py         # Code preprocessing utilities
-├── evaluation.py            # Main evaluation script
+├── evaluation.py            # Lexical evaluation script
+├── main.py                  # Manual evaluation script
 ├── retrieval/               # Retrieval implementations
 │   ├── base.py              # Base retriever class
 │   ├── bm25.py              # BM25 retriever
