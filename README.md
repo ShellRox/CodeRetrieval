@@ -45,9 +45,25 @@ project/
 
 ## Usage
 
-### Running Evaluation
+### Running Manual Evaluation
 
-The main script for running evaluations is `evaluation.py`. Here's how to use it:
+To run manual evaluation, you can use the script `main.py`, which includes 15 manually written queries of complexities: easy, medium, complex. You modify these as you wish.
+
+This script will run evaluations across all models. Here's how to use it
+
+```bash
+python main.py
+````
+
+Manual Evaluation Instructions:
+1. Open the results file at: `os.path.join(output_dir, "custom_eval_results.json"))`
+2. For each query, review the top results from each retriever
+3. Determine which result is most relevant to the query
+4. Compare how each retriever performs across different query difficulties
+
+### Running Lexical Evaluation
+
+The script for running automatic lexical evaluations is `evaluation.py`. Here's how to use it:
 
 ```bash
 python evaluation.py --data_dir ./data/python --subset valid --retrievers bm25 ast codebert bm25+ast codebert+bm25 codebert+ast codebert+bm25+ast
