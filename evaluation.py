@@ -301,12 +301,15 @@ def compare_retrievers(
 
     Args:
         results: Dictionary mapping retriever names to their evaluation results
-        metrics: List of metrics to compare (default: ['precision@3', 'precision@10', 'mrr', 'map'])
+        metrics: List of metrics to compare (default:
+         ['precision@3', 'precision@10', 'recall@1', 'recall@3', 'mrr', 'map'])
         categories: List of categories to include (None for all)
         output_dir: Directory to save visualizations
     """
     if metrics is None:
-        metrics = ['precision@3', 'precision@10', 'mrr', 'map']
+        metrics = ['precision@1', 'precision@3', 'precision@10',
+                   'recall@1', 'recall@3', 'recall@10',
+                   'mrr', 'map']
 
     if not results:
         print("No results to compare")
@@ -593,11 +596,13 @@ class RetrievalEvaluator:
         Generate evaluation report and visualizations.
 
         Args:
-            metrics: List of metrics to include (default: ['precision@3', 'precision@10', 'mrr', 'map'])
+            metrics: List of metrics to include (default:
+             ['precision@3', 'precision@10', 'recall@1', 'recall@3', 'recall@10', 'mrr', 'map'])
             categories: List of categories to include
         """
         if metrics is None:
-            metrics = ['precision@3', 'precision@10', 'mrr', 'map']
+            metrics = ['precision@1', 'precision@3', 'precision@10','recall@1', 'recall@3', 'recall@10',
+                       'mrr', 'map']
 
         # Clean results
         clean_results = {}
@@ -712,6 +717,8 @@ def evaluate_hybrid_retriever(name, retriever_names, weights, queries, k):
         'precision@3': 0.0,
         'precision@5': 0.0,
         'precision@10': 0.0,
+        'recall@1': 0.0,
+        'recall@3': 0.0,
         'recall@10': 0.0,
         'mrr': 0.0,
         'map': 0.0,
@@ -752,6 +759,8 @@ def evaluate_hybrid_retriever(name, retriever_names, weights, queries, k):
         precision_at_3 = compute_precision_at_k(retrieved_docs, relevant_docs, 3)
         precision_at_5 = compute_precision_at_k(retrieved_docs, relevant_docs, 5)
         precision_at_10 = compute_precision_at_k(retrieved_docs, relevant_docs, 10)
+        recall_at_1 = compute_recall_at_k(retrieved_docs, relevant_docs, 1)
+        recall_at_3 = compute_recall_at_k(retrieved_docs, relevant_docs, 3)
         recall_at_10 = compute_recall_at_k(retrieved_docs, relevant_docs, 10)
         mrr = compute_mean_reciprocal_rank(retrieved_docs, relevant_docs)
         map_score = compute_mean_average_precision(retrieved_docs, relevant_docs)
@@ -761,6 +770,8 @@ def evaluate_hybrid_retriever(name, retriever_names, weights, queries, k):
         metrics['precision@3'] += precision_at_3
         metrics['precision@5'] += precision_at_5
         metrics['precision@10'] += precision_at_10
+        metrics['recall@1'] += recall_at_1
+        metrics['recall@3'] += recall_at_3
         metrics['recall@10'] += recall_at_10
         metrics['mrr'] += mrr
         metrics['map'] += map_score
@@ -777,6 +788,8 @@ def evaluate_hybrid_retriever(name, retriever_names, weights, queries, k):
     metrics['precision@3'] /= num_queries
     metrics['precision@5'] /= num_queries
     metrics['precision@10'] /= num_queries
+    metrics['recall@1'] /= num_queries
+    metrics['recall@3'] /= num_queries
     metrics['recall@10'] /= num_queries
     metrics['mrr'] /= num_queries
     metrics['map'] /= num_queries
@@ -808,6 +821,9 @@ def print_metrics(metrics, name):
     print(f"Precision@3: {metrics['precision@3']:.4f}")
     print(f"Precision@5: {metrics['precision@5']:.4f}")
     print(f"Precision@10: {metrics['precision@10']:.4f}")
+    print(f"Precision@10: {metrics['precision@10']:.4f}")
+    print(f"Recall@1: {metrics['recall@1']:.4f}")
+    print(f"Recall@3: {metrics['recall@3']:.4f}")
     print(f"Recall@10: {metrics['recall@10']:.4f}")
     print(f"Average position (when found): {metrics['avg_position']:.2f}")
     print(f"Average query time: {metrics['avg_time'] * 1000:.2f} ms")
@@ -987,6 +1003,8 @@ if __name__ == "__main__":
             'precision@3': 0.0,
             'precision@5': 0.0,
             'precision@10': 0.0,
+            'recall@1': 0.0,
+            'recall@3': 0.0,
             'recall@10': 0.0,
             'mrr': 0.0,
             'map': 0.0,
@@ -1007,10 +1025,13 @@ if __name__ == "__main__":
                     position = j + 1
                     break
             metrics['per_query_positions'].append(position)
+
             precision_at_1 = compute_precision_at_k(retrieved_docs, relevant_docs, 1)
             precision_at_3 = compute_precision_at_k(retrieved_docs, relevant_docs, 3)
             precision_at_5 = compute_precision_at_k(retrieved_docs, relevant_docs, 5)
             precision_at_10 = compute_precision_at_k(retrieved_docs, relevant_docs, 10)
+            recall_at_1 = compute_recall_at_k(retrieved_docs, relevant_docs, 1)
+            recall_at_3 = compute_recall_at_k(retrieved_docs, relevant_docs, 3)
             recall_at_10 = compute_recall_at_k(retrieved_docs, relevant_docs, 10)
             mrr = compute_mean_reciprocal_rank(retrieved_docs, relevant_docs)
             map_score = compute_mean_average_precision(retrieved_docs, relevant_docs)
@@ -1018,6 +1039,8 @@ if __name__ == "__main__":
             metrics['precision@3'] += precision_at_3
             metrics['precision@5'] += precision_at_5
             metrics['precision@10'] += precision_at_10
+            metrics['recall@1'] += recall_at_1
+            metrics['recall@3'] += recall_at_3
             metrics['recall@10'] += recall_at_10
             metrics['mrr'] += mrr
             metrics['map'] += map_score
@@ -1030,6 +1053,8 @@ if __name__ == "__main__":
         metrics['precision@3'] /= num_queries
         metrics['precision@5'] /= num_queries
         metrics['precision@10'] /= num_queries
+        metrics['recall@1'] /= num_queries
+        metrics['recall@3'] /= num_queries
         metrics['recall@10'] /= num_queries
         metrics['mrr'] /= num_queries
         metrics['map'] /= num_queries
@@ -1091,6 +1116,27 @@ if __name__ == "__main__":
         json.dump(detailed_results, f, indent=2)
     with open(os.path.join(args.output_dir, 'evaluation_results.json'), 'w') as f:
         json.dump(results, f, indent=2)
+
+    metric_list = [
+        'precision@1', 'precision@3', 'precision@10',
+        'recall@1', 'recall@3', 'recall@10',
+        'mrr', 'map'
+    ]
+
+    # compare_retrievers expects metrics at the top level
+    from copy import deepcopy  # (if you added this import at top, you can delete this line)
+    clean_results = {}
+    for name, data in results.items():
+        clean_results[name] = deepcopy(data['metrics'])
+        clean_results[name]['avg_time']   = data['metrics']['avg_time']
+        clean_results[name]['total_time'] = data['metrics']['total_time']
+
+    compare_retrievers(
+        results   = clean_results,
+        metrics   = metric_list,
+        categories= None,
+        output_dir= args.output_dir
+    )
 
     import matplotlib.pyplot as plt
     for name, result in results.items():
@@ -1240,7 +1286,8 @@ if __name__ == "__main__":
         for _ in results.keys():
             comparison_report += "-------|"
         comparison_report += "\n"
-        for metric in ['mrr', 'map', 'precision@1', 'precision@3', 'precision@5', 'precision@10', 'recall@10',
+        for metric in ['mrr', 'map', 'precision@1', 'precision@3', 'precision@5', 'precision@10', 'recall@1',
+                       'recall@3', 'recall@10',
                        'found_ratio', 'avg_position']:
             if metric == 'found_ratio':
                 comparison_report += f"| Found Ratio |"
@@ -1271,7 +1318,7 @@ if __name__ == "__main__":
         for rn in results.keys():
             comparison_report += f" {results[rn]['evaluation_time']:.2f} s |"
         comparison_report += "\n"
-        comparison_report += "\n## Overall Comparison Visualization\n\n![Comparison](comparison.png)\n\n## Conclusion\n\nThis report compares the performance of different code retrieval methods on the same dataset and queries.\n"
+        comparison_report += "\n## Overall Comparison Visualization\n\n![Comparison](overall_comparison.png)\n\n## Conclusion\n\nThis report compares the performance of different code retrieval methods on the same dataset and queries.\n"
         with open(os.path.join(args.output_dir, 'comparison_report.md'), 'w') as f:
             f.write(comparison_report)
 
